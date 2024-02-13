@@ -16,30 +16,14 @@ struct FigmaViewModifier: ViewModifier {
         case fail
     }
 
-    private enum PreviewState: View, CaseIterable, Identifiable {
-        case hidden
-        case layers
-        case compare
-
-        var id: Self { self }
-
-        var body: some View {
-            switch self {
-            case .hidden:
-                Image(systemName: "eye.slash")
-            case .layers:
-                Image(systemName: "square.3.layers.3d.down.right")
-            case .compare:
-                Image(systemName: "slider.horizontal.below.square.and.square.filled")
-            }
-        }
-    }
-
     @State var contentType: ContentType
+    @State var previewState: PreviewState
     @State private var image: Image?
-    @State private var previewState: PreviewState = .layers
     @State private var opacity: Double = 0.5
-    @State private var centerOffset: CGFloat = 0
+
+    @State private var position: CGFloat = 0
+    @State private var dragOffset: CGFloat = 0
+
     @Environment(\.figmaAccessToken) private var figmaAccessToken
 
     func body(content: Content) -> some View {
@@ -67,6 +51,8 @@ struct FigmaViewModifier: ViewModifier {
                 opacity = 0.5
             case .compare:
                 opacity = 1
+                position = 0
+                dragOffset = 0
             }
         }
         .onAppear {
@@ -139,10 +125,8 @@ struct FigmaViewModifier: ViewModifier {
                     .if(previewState == .compare) { image in
                         image
                             .mask(alignment: .leading) {
-                                if previewState == .compare {
-                                    Rectangle()
-                                        .frame(width: geometry.size.width / 2 + centerOffset)
-                                }
+                                Rectangle()
+                                    .frame(width: geometry.size.width / 2 + position + dragOffset)
                             }
                     }
                 if previewState == .compare {
@@ -159,7 +143,6 @@ struct FigmaViewModifier: ViewModifier {
         ZStack {
             Color.white
                 .frame(width: 1)
-                .frame(height: 100)
             Image(systemName: "arrow.left.and.right")
                 .frame(width: 40, height: 40)
                 .background(Color.white)
@@ -167,12 +150,16 @@ struct FigmaViewModifier: ViewModifier {
                 .cornerRadius(20)
         }
         .fixedSize(horizontal: true, vertical: true)
-        .offset(x: centerOffset)
+        .offset(x: position + dragOffset)
         .gesture(
             DragGesture()
-                .onChanged({ value in
-                    centerOffset = value.translation.width
-                })
+                .onChanged { gesture in
+                    dragOffset = gesture.translation.width
+                }
+                .onEnded { gesture in
+                    position += gesture.translation.width
+                    dragOffset = 0
+                }
         )
     }
 
@@ -190,6 +177,22 @@ struct FigmaViewModifier: ViewModifier {
             throw Error.fail
         }
         return Image(uiImage: image)
+    }
+}
+
+extension PreviewState: View, Identifiable {
+
+    public var id: Self { self }
+
+    public var body: some View {
+        switch self {
+        case .hidden:
+            Image(systemName: "eye.slash")
+        case .layers:
+            Image(systemName: "square.3.layers.3d.down.right")
+        case .compare:
+            Image(systemName: "slider.horizontal.below.square.and.square.filled")
+        }
     }
 }
 

@@ -21,5 +21,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .frame(width: 400, height: 100)
-        .compare(with: Image(.component))
+        .compare(with: Image(.component), previewState: .compare)
 }
