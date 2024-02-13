@@ -1,15 +1,15 @@
 
-# FigmaPreview
+# Figma Preview
 
 <p align="center"/>
   <img src=".github/preview.png"/>
 </p>
 
-FigmaPreview is a Swift library designed to streamline the integration of Figma designs into your iOS applications. It allows developers to preview UI components directly from Figma files, facilitating a smoother design-to-code transition and ensuring that your app's UI matches the design specifications with precision.
+Figma Preview is a Swift library designed to streamline the integration of Figma designs into your Xcode Preview. It allows developers to preview UI components directly from Figma files, facilitating a smoother design-to-code transition and ensuring that your app's UI matches the design specifications with precision.
 
 ## Features
 
-- **Direct Preview:** Instantly preview Figma designs in your Swift projects.
+- **Direct Preview:** Instantly preview Figma designs in your Xcode Preview.
 - **Easy Integration:** Seamlessly integrates with Xcode, leveraging Swift Package Manager for straightforward installation.
 - **Design Sync:** Keep your application's UI in sync with the latest design changes in Figma.
 
@@ -17,10 +17,10 @@ FigmaPreview is a Swift library designed to streamline the integration of Figma 
 
 ### Swift Package Manager
 
-You can add FigmaPreview to an Xcode project by adding it as a package dependency.
+You can add Figma Preview to an Xcode project by adding it as a package dependency.
 
 1. From the File menu, select Swift Packages > Add Package Dependency...
-2. Enter the package repository URL: `https://github.com/artemnovichkov/FigmaPreview.git`
+2. Enter the package repository URL: `https://github.com/artemnovichkov/figma-preview.git`
 3. Specify the version rules that make sense for your project.
 
 ## Usage
