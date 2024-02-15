@@ -1,6 +1,10 @@
 
 # Figma Preview
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fartemnovichkov%2Ffigma-preview%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/artemnovichkov/figma-preview)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fartemnovichkov%2Ffigma-preview%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/artemnovichkov/figma-preview)
+
+
 <p align="center"/>
   <img src=".github/preview.png"/>
 </p>
