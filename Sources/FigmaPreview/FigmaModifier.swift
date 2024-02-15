@@ -13,16 +13,21 @@ struct FigmaViewModifier: ViewModifier {
     }
 
     enum Error: Swift.Error {
-        case fail
+        case wrongFigmaURL(URL)
+        case failToMakeImage(URL)
+        case failToGetImageURL(String)
     }
 
     @State var contentType: ContentType
     @State var previewState: PreviewState
+
     @State private var image: Image?
     @State private var opacity: Double = 0.5
 
     @State private var position: CGFloat = 0
     @State private var dragOffset: CGFloat = 0
+
+    @State private var session: URLSession = .shared
 
     @Environment(\.figmaAccessToken) private var figmaAccessToken
 
@@ -55,17 +60,15 @@ struct FigmaViewModifier: ViewModifier {
                 dragOffset = 0
             }
         }
-        .onAppear {
-            Task {
-                do {
-                    let image = try await self.image(for: contentType)
-                    await MainActor.run {
-                        self.image = image
-                    }
+        .task {
+            do {
+                let image = try await image(for: contentType)
+                await MainActor.run {
+                    self.image = image
                 }
-                catch {
-                    print(error)
-                }
+            }
+            catch {
+                print(error)
             }
         }
     }
@@ -75,18 +78,18 @@ struct FigmaViewModifier: ViewModifier {
     private func image(for contentType: ContentType) async throws -> Image {
         switch contentType {
         case .url(let url):
-            guard url.pathComponents.count >= 2 else {
-                throw Error.fail
+            guard url.pathComponents.count >= 3 else {
+                throw Error.wrongFigmaURL(url)
             }
             let fileID = url.pathComponents[2]
             guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-                throw Error.fail
+                throw Error.wrongFigmaURL(url)
             }
             guard let queryItem = components.queryItems?.first(where: { $0.name == "node-id" }) else {
-                throw Error.fail
+                throw Error.wrongFigmaURL(url)
             }
             guard let componentID = queryItem.value else {
-                throw Error.fail
+                throw Error.wrongFigmaURL(url)
             }
             return try await image(for: fileID, componentID: componentID)
         case .image(let image):
@@ -97,13 +100,10 @@ struct FigmaViewModifier: ViewModifier {
     }
 
     private var settingsPanel: some View {
-        VStack() {
+        VStack {
             HStack {
                 Picker("", selection: $previewState.animation()) {
-                    ForEach(PreviewState.allCases) { state in
-                        state
-
-                    }
+                    ForEach(PreviewState.allCases, content: \.body)
                 }
                 .pickerStyle(.segmented)
             }
@@ -141,8 +141,6 @@ struct FigmaViewModifier: ViewModifier {
 
     private func slideView(geometry: GeometryProxy) -> some View {
         ZStack {
-            Color.white
-                .frame(width: 1)
             Image(systemName: "arrow.left.and.right")
                 .frame(width: 40, height: 40)
                 .background(Color.white)
@@ -167,14 +165,15 @@ struct FigmaViewModifier: ViewModifier {
         let url = URL(string: "https://api.figma.com/v1/images/\(fileID)?ids=\(componentID)")!
         var request = URLRequest(url: url)
         request.setValue(figmaAccessToken, forHTTPHeaderField: "X-FIGMA-TOKEN")
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, _) = try await session.data(for: request)
         let response = try JSONDecoder().decode(FigmaResponse.self, from: data)
-        guard let imageURL = response.images[componentID.replacingOccurrences(of: "-", with: ":")] else {
-            throw Error.fail
+        let formattedComponentID = componentID.replacingOccurrences(of: "-", with: ":")
+        guard let imageURL = response.images[formattedComponentID] else {
+            throw Error.failToGetImageURL(formattedComponentID)
         }
-        let (imageData, _) = try await URLSession.shared.data(from: imageURL)
+        let (imageData, _) = try await session.data(from: imageURL)
         guard let image = UIImage(data: imageData) else {
-            throw Error.fail
+            throw Error.failToMakeImage(imageURL)
         }
         return Image(uiImage: image)
     }
@@ -196,19 +195,20 @@ extension PreviewState: View, Identifiable {
     }
 }
 
-struct FigmaResponse: Decodable {
+private struct FigmaResponse: Decodable {
 
     let err: String?
     let images: [String: URL]
 }
 
-extension View {
+private extension View {
 
     @ViewBuilder
     func `if`<T>(_ condition: Bool, transform: (Self) -> T) -> some View where T : View {
         if condition {
             transform(self)
-        } else {
+        }
+        else {
             self
         }
     }
