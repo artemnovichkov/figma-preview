@@ -98,7 +98,7 @@ I welcome contributions! If you would like to help improve Figma Preview, please
 
 ## Author
 
-Artem Novichkov, https://www.artemnovichkov.com/about
+Artem Novichkov, https://www.artemnovichkov.com/
 
 ## License
 
