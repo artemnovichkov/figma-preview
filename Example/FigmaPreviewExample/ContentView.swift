@@ -23,3 +23,9 @@ struct ContentView: View {
         .frame(width: 400, height: 100)
         .compare(with: Image(.component), previewState: .compare)
 }
+
+@available(iOS 18.0, *)
+#Preview("Trait", traits: .figma(Image(.component), previewState: .compare)) {
+    ContentView()
+        .frame(width: 400, height: 100)
+}

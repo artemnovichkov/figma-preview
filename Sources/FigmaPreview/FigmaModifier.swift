@@ -4,6 +4,12 @@
 
 import SwiftUI
 
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
 struct FigmaViewModifier: ViewModifier {
 
     enum ContentType {
@@ -172,10 +178,17 @@ struct FigmaViewModifier: ViewModifier {
             throw Error.failToGetImageURL(formattedComponentID)
         }
         let (imageData, _) = try await session.data(from: imageURL)
+#if canImport(UIKit)
         guard let image = UIImage(data: imageData) else {
             throw Error.failToMakeImage(imageURL)
         }
         return Image(uiImage: image)
+#elseif canImport(AppKit)
+        guard let image = NSImage(data: imageData) else {
+            throw Error.failToMakeImage(imageURL)
+        }
+        return Image(nsImage: image)
+#endif
     }
 }
 

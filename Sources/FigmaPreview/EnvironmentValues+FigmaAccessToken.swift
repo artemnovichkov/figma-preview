@@ -18,5 +18,5 @@ public extension EnvironmentValues {
 
 struct FigmaAccessTokenKey: EnvironmentKey {
 
-    static var defaultValue = ""
+    static let defaultValue = ""
 }

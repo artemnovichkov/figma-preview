@@ -127,6 +127,7 @@
 			);
 			mainGroup = 068CE8102B7A671000C9B7E6;
 			packageReferences = (
+				0677F73D2B7BA0BE006977A0 /* XCLocalSwiftPackageReference ".." */,
 			);
 			productRefGroup = 068CE81A2B7A671000C9B7E6 /* Products */;
 			projectDirPath = "";
@@ -362,9 +363,17 @@
 		};
 /* End XCConfigurationList section */
 
+	/* Begin XCLocalSwiftPackageReference section */
+		0677F73D2B7BA0BE006977A0 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+	/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		0677F73B2B7BA0BE006977A0 /* FigmaPreview */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0677F73D2B7BA0BE006977A0 /* XCLocalSwiftPackageReference ".." */;
 			productName = FigmaPreview;
 		};
 /* End XCSwiftPackageProductDependency section */
